@@ -58,6 +58,12 @@ describe('FirebaseAuth',function(){
       }
       return function () {/* Deregister */};
     });
+    spyOn(auth, 'onIdTokenChanged').and.callFake(function (cb) {
+      fakePromiseResolve = function (result) {
+        cb(result);
+      }
+      return function () {/* Deregister */};
+    });
 
     inject(function(_$firebaseAuth_,_$timeout_, $q, $rootScope){
       $firebaseAuth = _$firebaseAuth_;
@@ -342,7 +348,7 @@ describe('FirebaseAuth',function(){
       function cb() {}
       var ctx = {};
       authService.$onAuthStateChanged(cb, ctx);
-      expect(auth.onAuthStateChanged).toHaveBeenCalledWith(jasmine.any(Function));
+      expect(auth.onIdTokenChanged).toHaveBeenCalledWith(jasmine.any(Function));
     });
 
     it('returns a deregistration function', function(){

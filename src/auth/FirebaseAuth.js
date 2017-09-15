@@ -164,9 +164,9 @@
      */
     onAuthStateChanged: function(callback, context) {
       var fn = this._utils.debounce(callback, context, 0);
-      var off = this._auth.onAuthStateChanged(fn);
+      var off = this._auth.onIdTokenChanged(fn);
 
-      // Return a method to detach the `onAuthStateChanged()` callback.
+      // Return a method to detach the `onIdTokenChanged()` callback.
       return off;
     },
 
@@ -241,11 +241,11 @@
       return this._q(function(resolve) {
         var off;
         function callback() {
-          // Turn off this onAuthStateChanged() callback since we just needed to get the authentication data once.
+          // Turn off this onIdTokenChanged() callback since we just needed to get the authentication data once.
           off();
           resolve();
         }
-        off = auth.onAuthStateChanged(callback);
+        off = auth.onIdTokenChanged(callback);
       });
     },
 

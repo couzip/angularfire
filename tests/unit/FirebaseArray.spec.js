@@ -31,7 +31,9 @@ describe('$firebaseArray', function () {
 
   var arr, $firebaseArray, $utils, $timeout, $rootScope, $q, tick, testutils;
   beforeEach(function() {
-    module('firebase.database');
+    module('firebase.database', function(_$qProvider_) {
+      _$qProvider_.errorOnUnhandledRejections(false);
+    });
     module('testutils');
     inject(function (_$firebaseArray_, $firebaseUtils, _$timeout_, _$rootScope_, _$q_, _testutils_) {
       testutils = _testutils_;
@@ -680,14 +682,16 @@ describe('$firebaseArray', function () {
     });
 
     it('should reject $loaded() if not completed yet', function(done) {
-      var whiteSpy = jasmine.createSpy('resolve');
-      var blackSpy = jasmine.createSpy('reject');
       var arr = stubArray();
-      arr.$loaded().then(whiteSpy, blackSpy).then(function () {
-        expect(whiteSpy).not.toHaveBeenCalled();
-        expect(blackSpy.calls.argsFor(0)[0]).toMatch(/destroyed/i);
-        done();
-      });
+      arr.$loaded()
+        .then(function () {
+          fail('Should not have resolved');
+          done();
+        })
+        .catch(function (err) {
+          expect(err).toMatch(/destroyed/i);
+          done();
+        });
       arr.$destroy();
 
       $rootScope.$digest();
@@ -1077,7 +1081,7 @@ describe('$firebaseArray', function () {
     if( !ref ) {
       ref = stubRef();
     }
-    var arr = new Factory(ref);
+    var arr = Factory(ref);
     if( initialData ) {
       ref.set(initialData);
     }
